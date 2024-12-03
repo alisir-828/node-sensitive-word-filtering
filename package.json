@@ -1,0 +1,26 @@
+{
+    "name": "sensitive-word-filtering",
+    "version": "1.0.1",
+    "description": "A Node.js library for filtering sensitive words using a prefix tree (Trie).",
+    "main": "sensitive-word-trie.js",
+    "types": "index.d.ts",
+    "author": "aliSir",
+    "license": "MIT",
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/alisir-828/node-sensitive-word-filtering.git"
+    },
+    "keywords": [
+        "sensitive",
+        "word",
+        "filtering",
+        "trie",
+        "profanity-filter",
+        "text-cleanup",
+        "node"
+    ],
+    "bugs": {
+      "url": "https://github.com/alisir-828/node-sensitive-word-filtering/issues"
+    },
+    "homepage": "https://github.com/alisir-828#readme"
+  }

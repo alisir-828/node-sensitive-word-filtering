@@ -30,3 +30,6 @@ fileContent.split(/\r?\n/).forEach((word) => {
         console.log('---');
     }
 });
+
+const filteredText = trie.filter(' naaaa');
+console.log(`Blank chars: ${filteredText}`);

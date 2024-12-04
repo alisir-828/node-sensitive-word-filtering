@@ -1,5 +1,14 @@
 declare class Trie {
     /**
+     * Creates a new instance of the Trie.
+     * @param options The global options for the Trie.
+     * @param options.replacement Optional. The replacement character or string for sensitive words. Defaults to '*'.
+     * @param options.ignoreSpaces Optional. Whether to ignore spaces between characters when matching. Defaults to false.
+     * @param options.ignoreCase Optional. Whether to ignore case when matching. Defaults to false.
+     */
+    constructor(options?: { replacement?: string; ignoreSpaces?: boolean; ignoreCase?: boolean });
+
+    /**
      * Inserts a word into the Trie.
      * @param word The word to insert.
      */
@@ -19,14 +28,11 @@ declare class Trie {
     delete(word: string): void;
 
     /**
-     * Filters the input text and replaces sensitive words with asterisks.
-     * @param options The filter options.
-     * @param options.text The input text to filter.
-     * @param options.ignoreSpaces Optional. Whether to ignore spaces between characters when matching. Defaults to false.
-     * @param options.ignoreCase Optional. Whether to ignore case when matching. Defaults to false.
+     * Filters the input text and replaces sensitive words with the configured replacement string.
+     * @param text The input text to filter.
      * @returns The filtered text.
      */
-    filter(options: { text: string; ignoreSpaces?: boolean; ignoreCase?: boolean }): string;
+    filter(text: string): string;
 }
 
 export = Trie;

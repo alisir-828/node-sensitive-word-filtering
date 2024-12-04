@@ -9,11 +9,14 @@ class Trie {
     constructor(options = {}) {
         this.root = new TrieNode();
         this.replacement = options.replacement || '*';
+        this.ignoreSpaces = options.ignoreSpaces || false;
+        this.ignoreCase = options.ignoreCase || false;
     }
 
     insert(word) {
+        const normalizedWord = this.normalizeWord(word);
         let node = this.root;
-        for (const char of word) {
+        for (const char of normalizedWord) {
             if (!node.children[char]) {
                 node.children[char] = new TrieNode();
             }
@@ -23,8 +26,9 @@ class Trie {
     }
 
     contains(word) {
+        const normalizedWord = this.normalizeWord(word); // 预处理敏感词
         let node = this.root;
-        for (const char of word) {
+        for (const char of normalizedWord) {
             if (!node.children[char]) {
                 return false;
             }
@@ -34,6 +38,7 @@ class Trie {
     }
 
     delete(word) {
+        const normalizedWord = this.normalizeWord(word);
         const deleteRecursively = (node, word, depth) => {
             if (!node) return false;
             if (depth === word.length) {
@@ -58,23 +63,22 @@ class Trie {
             }
             return false;
         };
-        deleteRecursively(this.root, word, 0);
+        deleteRecursively(this.root, normalizedWord, 0);
     }
 
-    filter({ text, ignoreSpaces = false, ignoreCase = false }) {
+    filter(text) {
+        const normalizedText = this.normalizeWord(text);
         const resultArray = [];
-        const characters = Array.from(ignoreCase ? text.toLowerCase() : text);
+        const characters = Array.from(normalizedText);
         const originalChars = Array.from(text);
         let i = 0;
+
         while (i < characters.length) {
             let node = this.root;
             let j = i;
             let matchLength = 0;
+
             while (j < characters.length) {
-                if (ignoreSpaces && characters[j] === ' ') {
-                    j++;
-                    continue;
-                }
                 if (!node.children[characters[j]]) {
                     break;
                 }
@@ -84,6 +88,7 @@ class Trie {
                     matchLength = j - i;
                 }
             }
+
             if (matchLength > 0) {
                 resultArray.push(this.replacement.repeat(matchLength));
                 i += matchLength;
@@ -92,7 +97,19 @@ class Trie {
                 i++;
             }
         }
+
         return resultArray.join('');
+    }
+
+    normalizeWord(word) {
+        let normalizedWord = word;
+        if (this.ignoreSpaces) {
+            normalizedWord = normalizedWord.replace(/\s+/g, '');
+        }
+        if (this.ignoreCase) {
+            normalizedWord = normalizedWord.toLowerCase();
+        }
+        return normalizedWord;
     }
 }
 

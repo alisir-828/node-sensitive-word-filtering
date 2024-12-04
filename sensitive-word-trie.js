@@ -67,9 +67,8 @@ class Trie {
     }
 
     filter(text) {
-        const normalizedText = this.normalizeWord(text);
         const resultArray = [];
-        const characters = Array.from(normalizedText);
+        const characters = Array.from(this.ignoreCase ? text.toLowerCase() : text);
         const originalChars = Array.from(text);
         let i = 0;
 
@@ -79,6 +78,10 @@ class Trie {
             let matchLength = 0;
 
             while (j < characters.length) {
+                if (this.ignoreSpaces && characters[j] === ' ') {
+                    j++;
+                    continue;
+                }
                 if (!node.children[characters[j]]) {
                     break;
                 }
@@ -88,16 +91,24 @@ class Trie {
                     matchLength = j - i;
                 }
             }
-
             if (matchLength > 0) {
-                resultArray.push(this.replacement.repeat(matchLength));
-                i += matchLength;
+                for (let k = i; k < j; k++) {
+                    if (this.ignoreSpaces && originalChars[k] === ' ') {
+                        resultArray.push(' ');
+                    } else {
+                        resultArray.push(this.replacement);
+                    }
+                }
+                i = j;
             } else {
-                resultArray.push(originalChars[i]);
+                if (this.ignoreSpaces && originalChars[i] === ' ') {
+                    resultArray.push(' ');
+                } else {
+                    resultArray.push(originalChars[i]);
+                }
                 i++;
             }
         }
-
         return resultArray.join('');
     }
 

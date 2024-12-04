@@ -6,8 +6,9 @@ class TrieNode {
 }
 
 class Trie {
-    constructor() {
+    constructor(options = {}) {
         this.root = new TrieNode();
+        this.replacement = options.replacement || '*';
     }
 
     insert(word) {
@@ -84,7 +85,7 @@ class Trie {
                 }
             }
             if (matchLength > 0) {
-                resultArray.push('*'.repeat(matchLength));
+                resultArray.push(this.replacement.repeat(matchLength));
                 i += matchLength;
             } else {
                 resultArray.push(originalChars[i]);

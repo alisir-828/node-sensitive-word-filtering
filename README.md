@@ -20,7 +20,7 @@
 使用 NPM 安装：
 
 ```bash
-npm install node-sensitive-word-filtering
+npm install sensitive-word-filtering
 ```
 
 ### 示例使用
@@ -28,7 +28,7 @@ npm install node-sensitive-word-filtering
 #### JavaScript 示例
 
 ```js
-const Trie = require('node-sensitive-word-filtering');
+const Trie = require('sensitive-word-filtering');
 
 const trie = new Trie();
 
@@ -49,7 +49,7 @@ console.log(filteredText); // 输出: **** 和其他内容
 #### TypeScript 示例
 
 ```ts
-import Trie from 'node-sensitive-word-filtering';
+import Trie from 'sensitive-word-filtering';
 
 const trie = new Trie();
 
@@ -111,7 +111,7 @@ A sensitive word filtering script implemented in Node.js, using a prefix tree (T
 Install via NPM:
 
 ```bash
-npm install node-sensitive-word-filtering
+npm install sensitive-word-filtering
 ```
 
 ### Example Usage
@@ -119,7 +119,7 @@ npm install node-sensitive-word-filtering
 #### JavaScript Example
 
 ```js
-const Trie = require('node-sensitive-word-filtering');
+const Trie = require('sensitive-word-filtering');
 
 const trie = new Trie();
 
@@ -141,7 +141,7 @@ console.log(filteredText); // Output: This contains **** and some other text.
 #### TypeScript Example
 
 ```ts
-import Trie from 'node-sensitive-word-filtering';
+import Trie from 'sensitive-word-filtering';
 
 const trie = new Trie();
 

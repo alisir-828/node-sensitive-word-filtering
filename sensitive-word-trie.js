@@ -26,7 +26,7 @@ class Trie {
     }
 
     contains(word) {
-        const normalizedWord = this.normalizeWord(word); // 预处理敏感词
+        const normalizedWord = this.normalizeWord(word);
         let node = this.root;
         for (const char of normalizedWord) {
             if (!node.children[char]) {
@@ -39,20 +39,20 @@ class Trie {
 
     delete(word) {
         const normalizedWord = this.normalizeWord(word);
-        const deleteRecursively = (node, word, depth) => {
+        const deleteRecursively = (node, w, depth) => {
             if (!node) return false;
-            if (depth === word.length) {
+            if (depth === w.length) {
                 if (node.isEndOfWord) {
                     node.isEndOfWord = false;
                     return Object.keys(node.children).length === 0;
                 }
                 return false;
             }
-            const char = word[depth];
+            const char = w[depth];
             const childNode = node.children[char];
             const shouldDeleteChild = deleteRecursively(
                 childNode,
-                word,
+                w,
                 depth + 1
             );
             if (shouldDeleteChild) {
@@ -66,49 +66,83 @@ class Trie {
         deleteRecursively(this.root, normalizedWord, 0);
     }
 
+    isAlnum(ch) {
+        return ch && /\p{L}|\p{N}/u.test(ch);
+    }
+
     filter(text) {
-        const resultArray = [];
-        const characters = Array.from(this.ignoreCase ? text.toLowerCase() : text);
         const originalChars = Array.from(text);
+        const characters = this.ignoreCase
+            ? Array.from(text.toLowerCase())
+            : Array.from(text);
+
+        let resultArray = [];
         let i = 0;
 
         while (i < characters.length) {
             let node = this.root;
             let j = i;
             let matchLength = 0;
+            let matchedNonSpaceIndices = [];
 
             while (j < characters.length) {
-                if (this.ignoreSpaces && characters[j] === ' ') {
+                const ch = characters[j];
+                const originalCh = originalChars[j];
+
+                if (this.ignoreSpaces && originalCh === ' ') {
                     j++;
                     continue;
                 }
-                if (!node.children[characters[j]]) {
+
+                if (!node.children[ch]) {
                     break;
                 }
-                node = node.children[characters[j]];
+                node = node.children[ch];
+                matchedNonSpaceIndices.push(j);
                 j++;
                 if (node.isEndOfWord) {
-                    matchLength = j - i;
+                    matchLength = matchedNonSpaceIndices.length;
                 }
             }
+
             if (matchLength > 0) {
-                for (let k = i; k < j; k++) {
-                    if (this.ignoreSpaces && originalChars[k] === ' ') {
-                        resultArray.push(' ');
-                    } else {
-                        resultArray.push(this.replacement);
+                const startIndex = matchedNonSpaceIndices[0];
+                const endIndex =
+                    matchedNonSpaceIndices[matchedNonSpaceIndices.length - 1];
+
+                const prevChar =
+                    startIndex > 0 ? originalChars[startIndex - 1] : null;
+                const nextChar =
+                    endIndex < originalChars.length - 1
+                        ? originalChars[endIndex + 1]
+                        : null;
+
+                const startBoundary = !this.isAlnum(prevChar);
+                const endBoundary = !this.isAlnum(nextChar);
+
+                if (startBoundary && endBoundary) {
+                    let currentPos = i;
+                    while (currentPos < j) {
+                        const originalCh = originalChars[currentPos];
+                        if (this.ignoreSpaces && originalCh === ' ') {
+                            resultArray.push(' ');
+                        } else {
+                            resultArray.push(this.replacement);
+                        }
+                        currentPos++;
                     }
-                }
-                i = j;
-            } else {
-                if (this.ignoreSpaces && originalChars[i] === ' ') {
-                    resultArray.push(' ');
+                    i = j;
+                    continue;
                 } else {
                     resultArray.push(originalChars[i]);
+                    i++;
                 }
+            } else {
+                resultArray.push(originalChars[i]);
                 i++;
             }
         }
+
         return resultArray.join('');
     }
 

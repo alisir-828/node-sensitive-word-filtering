@@ -31,9 +31,12 @@ fileContent.split(/\r?\n/).forEach((word) => {
     }
 });
 
-const filteredText1 = trie.filter(' naaaa');
-const filteredText2 = trie.filter('button');
+const filteredText1 =  trie.filter('Mon père a remporté le MVP');
+const filteredText2 = trie.filter('soop hilia');
 const filteredText3 = trie.filter('敏感词语');
+const filteredText4 = trie.filter('😅');
 console.log(`test1: ${filteredText1}`);
 console.log(`test2: ${filteredText2}`);
 console.log(`test3: ${filteredText3}`);
+console.log(`test4: ${filteredText4}`);
+console.log("Mon père a remporté le MVP" === filteredText1);

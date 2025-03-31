@@ -85,7 +85,6 @@ class Trie {
     }
 
     filter(text) {
-        // 对输入文本进行Unicode规范化
         const normalizedText = this.ignoreCase ? text.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase() : text;
         const originalChars = Array.from(text);
         const characters = Array.from(normalizedText);
@@ -97,13 +96,15 @@ class Trie {
             let node = this.root;
             let j = i;
             let matchLength = 0;
-            let matchedNonSpaceIndices = [];
+            let matchedIndices = [];
+            let tempIndices = [];
 
             while (j < characters.length) {
                 const ch = characters[j];
                 const originalCh = originalChars[j];
 
                 if (this.ignoreSpaces && /\s/.test(originalCh)) {
+                    tempIndices.push(j);
                     j++;
                     continue;
                 }
@@ -112,16 +113,17 @@ class Trie {
                     break;
                 }
                 node = node.children[ch];
-                matchedNonSpaceIndices.push(j);
-                j++;
+                tempIndices.push(j);
                 if (node.isEndOfWord) {
-                    matchLength = matchedNonSpaceIndices.length;
+                    matchLength = tempIndices.length;
+                    matchedIndices = [...tempIndices];
                 }
+                j++;
             }
 
             if (matchLength > 0) {
-                const startIndex = matchedNonSpaceIndices[0];
-                const endIndex = matchedNonSpaceIndices[matchedNonSpaceIndices.length - 1];
+                const startIndex = matchedIndices[0];
+                const endIndex = matchedIndices[matchedIndices.length - 1];
 
                 const prevChar = startIndex > 0 ? originalChars[startIndex - 1] : null;
                 const nextChar = endIndex < originalChars.length - 1 ? originalChars[endIndex + 1] : null;
@@ -130,17 +132,19 @@ class Trie {
                 const endBoundary = !this.isAlnum(nextChar);
 
                 if (startBoundary && endBoundary) {
-                    let currentPos = i;
-                    while (currentPos < j) {
-                        const originalCh = originalChars[currentPos];
-                        if (this.ignoreSpaces && /\s/.test(originalCh)) {
-                            resultArray.push(originalCh);
+                    for (let currentPos = i; currentPos <= endIndex; currentPos++) {
+                        if (matchedIndices.includes(currentPos)) {
+                            const originalCh = originalChars[currentPos];
+                            if (this.ignoreSpaces && /\s/.test(originalCh)) {
+                                resultArray.push(originalCh);
+                            } else {
+                                resultArray.push(this.replacement);
+                            }
                         } else {
-                            resultArray.push(this.replacement);
+                            resultArray.push(originalChars[currentPos]);
                         }
-                        currentPos++;
                     }
-                    i = j;
+                    i = endIndex + 1;
                     continue;
                 }
             }

@@ -1,6 +1,6 @@
 {
     "name": "sensitive-word-filtering",
-    "version": "2.0.2",
+    "version": "2.1.2",
     "description": "A Node.js library for filtering sensitive words using a prefix tree (Trie).",
     "main": "sensitive-word-trie.js",
     "types": "index.d.ts",

@@ -70,11 +70,25 @@ class Trie {
         return ch && /\p{L}|\p{N}/u.test(ch);
     }
 
+    normalizeWord(word) {
+        let normalizedWord = word;
+        if (this.ignoreSpaces) {
+            normalizedWord = normalizedWord.replace(/\s+/g, '');
+        }
+        if (this.ignoreCase) {
+            // 使用Unicode规范化来处理特殊字符
+            normalizedWord = normalizedWord.normalize('NFKD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase();
+        }
+        return normalizedWord;
+    }
+
     filter(text) {
+        // 对输入文本进行Unicode规范化
+        const normalizedText = this.ignoreCase ? text.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase() : text;
         const originalChars = Array.from(text);
-        const characters = this.ignoreCase
-            ? Array.from(text.toLowerCase())
-            : Array.from(text);
+        const characters = Array.from(normalizedText);
 
         let resultArray = [];
         let i = 0;
@@ -89,7 +103,7 @@ class Trie {
                 const ch = characters[j];
                 const originalCh = originalChars[j];
 
-                if (this.ignoreSpaces && originalCh === ' ') {
+                if (this.ignoreSpaces && /\s/.test(originalCh)) {
                     j++;
                     continue;
                 }
@@ -107,15 +121,10 @@ class Trie {
 
             if (matchLength > 0) {
                 const startIndex = matchedNonSpaceIndices[0];
-                const endIndex =
-                    matchedNonSpaceIndices[matchedNonSpaceIndices.length - 1];
+                const endIndex = matchedNonSpaceIndices[matchedNonSpaceIndices.length - 1];
 
-                const prevChar =
-                    startIndex > 0 ? originalChars[startIndex - 1] : null;
-                const nextChar =
-                    endIndex < originalChars.length - 1
-                        ? originalChars[endIndex + 1]
-                        : null;
+                const prevChar = startIndex > 0 ? originalChars[startIndex - 1] : null;
+                const nextChar = endIndex < originalChars.length - 1 ? originalChars[endIndex + 1] : null;
 
                 const startBoundary = !this.isAlnum(prevChar);
                 const endBoundary = !this.isAlnum(nextChar);
@@ -124,8 +133,8 @@ class Trie {
                     let currentPos = i;
                     while (currentPos < j) {
                         const originalCh = originalChars[currentPos];
-                        if (this.ignoreSpaces && originalCh === ' ') {
-                            resultArray.push(' ');
+                        if (this.ignoreSpaces && /\s/.test(originalCh)) {
+                            resultArray.push(originalCh);
                         } else {
                             resultArray.push(this.replacement);
                         }
@@ -133,28 +142,13 @@ class Trie {
                     }
                     i = j;
                     continue;
-                } else {
-                    resultArray.push(originalChars[i]);
-                    i++;
                 }
-            } else {
-                resultArray.push(originalChars[i]);
-                i++;
             }
+            resultArray.push(originalChars[i]);
+            i++;
         }
 
         return resultArray.join('');
-    }
-
-    normalizeWord(word) {
-        let normalizedWord = word;
-        if (this.ignoreSpaces) {
-            normalizedWord = normalizedWord.replace(/\s+/g, '');
-        }
-        if (this.ignoreCase) {
-            normalizedWord = normalizedWord.toLowerCase();
-        }
-        return normalizedWord;
     }
 }
 

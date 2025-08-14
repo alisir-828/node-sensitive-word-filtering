@@ -5,8 +5,14 @@ declare class Trie {
      * @param options.replacement Optional. The replacement character or string for sensitive words. Defaults to '*'.
      * @param options.ignoreSpaces Optional. Whether to ignore spaces between characters when matching. Defaults to false.
      * @param options.ignoreCase Optional. Whether to ignore case when matching. Defaults to false.
+     * @param options.isOpenWildcard Optional. Whether to open the wildcard feature. Defaults to false.
      */
-    constructor(options?: { replacement?: string; ignoreSpaces?: boolean; ignoreCase?: boolean });
+    constructor(options?: {
+        replacement?: string;
+        ignoreSpaces?: boolean;
+        ignoreCase?: boolean;
+        isOpenWildcard?: boolean;
+    });
 
     /**
      * Inserts a word into the Trie.

@@ -234,7 +234,7 @@ nawashi
 negro
 neonazi
 nigga
-nigger
+nigger*
 nig nog
 nimphomania
 nipple
@@ -402,3 +402,4 @@ yiffy
 zoophilia
 🖕
 敏感词
+yaoi*

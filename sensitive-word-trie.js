@@ -2,6 +2,7 @@ class TrieNode {
     constructor() {
         this.children = {};
         this.isEndOfWord = false;
+        this.isWildcard = false;
     }
 }
 
@@ -11,18 +12,28 @@ class Trie {
         this.replacement = options.replacement || '*';
         this.ignoreSpaces = options.ignoreSpaces || false;
         this.ignoreCase = options.ignoreCase || false;
+        this.isOpenWildcard = options.isOpenWildcard | false;
     }
 
     insert(word) {
         const normalizedWord = this.normalizeWord(word);
         let node = this.root;
-        for (const char of normalizedWord) {
+
+        const isWildcardPattern = normalizedWord.endsWith('*') && this.isOpenWildcard ;
+        const wordToInsert = isWildcardPattern ? normalizedWord.slice(0, -1) : normalizedWord;
+
+        for (const char of wordToInsert) {
             if (!node.children[char]) {
                 node.children[char] = new TrieNode();
             }
             node = node.children[char];
         }
-        node.isEndOfWord = true;
+
+       if (isWildcardPattern) {
+            node.isWildcard = true;
+        } else {
+            node.isEndOfWord = true;
+        }
     }
 
     contains(word) {
@@ -33,7 +44,12 @@ class Trie {
                 return false;
             }
             node = node.children[char];
+
+            if (node.isWildcard) {
+                return true;
+            }
         }
+
         return node.isEndOfWord;
     }
 
@@ -98,6 +114,7 @@ class Trie {
             let matchLength = 0;
             let matchedIndices = [];
             let tempIndices = [];
+            let wildcardPrefixLength = 0;
 
             while (j < characters.length) {
                 const ch = characters[j];
@@ -114,6 +131,24 @@ class Trie {
                 }
                 node = node.children[ch];
                 tempIndices.push(j);
+
+                // 检查是否匹配到通配符节点
+                if (node.isWildcard) {
+                    wildcardPrefixLength = tempIndices.length; // 记录前缀长度
+                    // 继续匹配后续字符直到单词边界
+                    let k = j + 1;
+                    while (k < characters.length && this.isAlnum(characters[k])) {
+                        tempIndices.push(k);
+                        k++;
+                    }
+                    // 检查是否到达单词边界
+                    if (k >= characters.length || !this.isAlnum(characters[k])) {
+                        matchLength = tempIndices.length;
+                        matchedIndices = [...tempIndices];
+                    }
+                    break;
+                }
+
                 if (node.isEndOfWord) {
                     matchLength = tempIndices.length;
                     matchedIndices = [...tempIndices];
@@ -138,7 +173,16 @@ class Trie {
                             if (this.ignoreSpaces && /\s/.test(originalCh)) {
                                 resultArray.push(originalCh);
                             } else {
-                                resultArray.push(this.replacement);
+                                // 对于通配符匹配，只替换前缀部分
+                                if (wildcardPrefixLength > 0 && (currentPos - i) < wildcardPrefixLength) {
+                                    resultArray.push(this.replacement);
+                                } else if (wildcardPrefixLength === 0) {
+                                    // 普通匹配，全部替换
+                                    resultArray.push(this.replacement);
+                                } else {
+                                    // 通配符匹配的后缀部分，保持原样
+                                    resultArray.push(originalCh);
+                                }
                             }
                         } else {
                             resultArray.push(originalChars[currentPos]);

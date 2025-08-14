@@ -6,6 +6,7 @@ const trie = new Trie({
     replacement: '#',
     ignoreCase: true,
     ignoreSpaces: true,
+    isOpenWildcard: true,
 });
 
 
@@ -36,9 +37,11 @@ const filteredText2 = trie.filter('soop hilia');
 const filteredText3 = trie.filter('敏感词语');
 const filteredText4 = trie.filter('😅');
 const filteredText5 = trie.filter('fu  ck  this game');
+const filteredText6 = trie.filter('NiggerFage');
 console.log(`test1: ${filteredText1}`);
 console.log(`test2: ${filteredText2}`);
 console.log(`test3: ${filteredText3}`);
 console.log(`test4: ${filteredText4}`);
 console.log(`test4: ${filteredText5}`);
 console.log("Mon père a remporté le MVP" === filteredText1);
+console.log(filteredText6);
